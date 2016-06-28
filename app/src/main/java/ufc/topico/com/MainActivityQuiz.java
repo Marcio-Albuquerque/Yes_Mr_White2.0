@@ -1,3 +1,6 @@
+// MainActivityQuiz.java
+// Hospeda o componente QuizFragment em um telefone e os
+// Componentes QuizFragment e SettingsFragment em um tablet
 package ufc.topico.com;
 
 import android.app.Activity;
@@ -19,7 +22,7 @@ import java.util.Set;
 
 public class MainActivityQuiz extends Activity {
 
-    // keys for reading data from SharedPreferences
+    // chaves para ler dados de SharedPreferences
     public static final String CHOICES = "pref_numberOfChoices";
     public static final String REGIONS = "pref_regionsToInclude";
 
@@ -30,30 +33,32 @@ public class MainActivityQuiz extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_quiz);
-        // set default values in the app's SharedPreferences
+
+        // configura valores padrão no elemento SharedPreferences do aplicativo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        // register listener for SharedPreferences changes
+        // registra receptor para alterações em SharedPreferences
         PreferenceManager.getDefaultSharedPreferences(this).
                 registerOnSharedPreferenceChangeListener(
                         preferenceChangeListener);
 
-        // determine screen size
+        // determina o tamanho da tela
         int screenSize = getResources().getConfiguration().screenLayout &
                 Configuration.SCREENLAYOUT_SIZE_MASK;
 
-        // if device is a tablet, set phoneDevice to false
+        // se o dispositivo é um tablet, configura phoneDevice como false
         if (screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE ||
                 screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE )
             phoneDevice = false; // not a phone-sized device
 
-        // if running on phone-sized device, allow only portrait orientation
+        // se estiver sendo executado em dispositivo do tamanho de um telefone, só
+        // permite orientação retrato
         if (phoneDevice)
             setRequestedOrientation(
                     ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    } // end method onCreate
+    } // fim do método onCreate
 
-    // called after onCreate completes execution
+    // chamado depois que onCreate completa a execução
     @Override
     protected void onStart()
     {
@@ -61,8 +66,8 @@ public class MainActivityQuiz extends Activity {
 
         if (preferencesChanged)
         {
-            // now that the default preferences have been set,
-            // initialize QuizFragment and start the quiz
+            // agora que as preferências padrão foram configuradas,
+            // inicializa QuizFragment e inicia o teste
             QuizFragment quizFragment = (QuizFragment)
                     getFragmentManager().findFragmentById(R.id.quizFragment);
             quizFragment.updateGuessRows(
@@ -72,29 +77,30 @@ public class MainActivityQuiz extends Activity {
             quizFragment.resetQuiz();
             preferencesChanged = false;
         }
-    } // end method onStart
+    } // fim do método onStart
 
-    // show menu if app is running on a phone or a portrait-oriented tablet
+    // mostra o menu se o aplicativo estiver sendo executado em um telefone ou em um
+    // tablet na orientação retrato
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // get the default Display object representing the screen
+        // obtém o objeto Display padrão que representa a tela
         Display display = ((WindowManager)
                 getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-        Point screenSize = new Point(); // used to store screen size
-        display.getRealSize(screenSize); // store size in screenSize
+        Point screenSize = new Point();  // usado para armazenar o tamanho da tela
+        display.getRealSize(screenSize); // armazena o tamanho em screenSize
 
-        // display the app's menu only in portrait orientation
-        if (screenSize.x < screenSize.y) // x is width, y is height
+        // só exibe o menu do aplicativo na orientação retrato
+        if (screenSize.x < screenSize.y) // x é a largura, y é a altura
         {
-            getMenuInflater().inflate(R.menu.main, menu); // inflate the menu
+            getMenuInflater().inflate(R.menu.main, menu);  // infla o menu
             return true;
         }
         else
             return false;
-    } // end method onCreateOptionsMenu
+    } // fim do método onCreateOptionsMenu
 
-    // displays SettingsActivity when running on a phone
+    // exibe SettingsActivity ao ser executado em um telefone
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -103,26 +109,28 @@ public class MainActivityQuiz extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    // listener for changes to the app's SharedPreferences
+    // exibe SettingsActivity ao ser executado em um telefone
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener =
             new SharedPreferences.OnSharedPreferenceChangeListener()
             {
-                // called when the user changes the app's preferences
+                // chamado quando o usuário altera as preferências do aplicativo
                 @Override
                 public void onSharedPreferenceChanged(
                         SharedPreferences sharedPreferences, String key)
                 {
-                    preferencesChanged = true; // user changed app settings
+                    preferencesChanged = true; // o usuário mudou as configurações do aplicativo
 
                     QuizFragment quizFragment = (QuizFragment)
                             getFragmentManager().findFragmentById(R.id.quizFragment);
 
-                    if (key.equals(CHOICES)) // # of choices to display changed
+
+
+                    if (key.equals(CHOICES))// o nº de escolhas a exibir mudou
                     {
                         quizFragment.updateGuessRows(sharedPreferences);
                         quizFragment.resetQuiz();
                     }
-                    else if (key.equals(REGIONS)) // regions to include changed
+                    else if (key.equals(REGIONS))  // outras opções de tabelas a incluir mudaram
                     {
                         Set<String> regions =
                                 sharedPreferences.getStringSet(REGIONS, null);
@@ -132,7 +140,7 @@ public class MainActivityQuiz extends Activity {
                             quizFragment.updateRegions(sharedPreferences);
                             quizFragment.resetQuiz();
                         }
-                        else // must select one region--set North America as default
+                        else // deve selecionar uma Tabela -- configura Tabela Completa como padrão
                         {
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             regions.add(
@@ -147,6 +155,7 @@ public class MainActivityQuiz extends Activity {
 
                     Toast.makeText(MainActivityQuiz.this,
                             R.string.restarting_quiz, Toast.LENGTH_SHORT).show();
-                } // end method onSharedPreferenceChanged
-            }; // end anonymous inner class
-} // end class MainActivity
+                } // fim do método onSharedPreferenceChanged
+            };// fim da classe interna anônima
+
+}// fim da classe MainActivityQuiz

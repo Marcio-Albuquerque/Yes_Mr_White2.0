@@ -1,3 +1,5 @@
+// QuizFragment.java
+// Contém a lógica do aplicativo Quiz Química
 package ufc.topico.com;
 
 import java.io.IOException;
@@ -32,29 +34,30 @@ import android.widget.TextView;
 
 public class QuizFragment extends Fragment
 {
-    // String used when logging error messages
-    private static final String TAG = "FlagQuiz Activity";
+    // String usada ao registrar mensagens de erro
+    private static final String TAG = "Quiz Quimica Activity";
 
     //Numero de questões
-    private static final int FLAGS_IN_QUIZ = 2;
+    private static final int FLAGS_IN_QUIZ = 10;
 
-    private List<String> fileNameList; // flag file names
-    private List<String> quizCountriesList; // countries in current quiz
-    private Set<String> regionsSet; // world regions in current quiz
-    private String correctAnswer; // correct country for the current flag
-    private int totalGuesses; // number of guesses made
-    private int correctAnswers; // number of correct guesses
-    private int guessRows; // number of rows displaying guess Buttons
-    private SecureRandom random; // used to randomize the quiz
-    private Handler handler; // used to delay loading next flag
-    private Animation shakeAnimation; // animation for incorrect guess
+    private List<String> fileNameList;  // nomes de arquivo do elemento quimico
+    private List<String> quizCountriesList; // elementos químico no teste atual
+    private Set<String> regionsSet; // Qual tabela do no teste atual
+    private String correctAnswer;  // string da resposta correta do elemento atual
+    private int totalGuesses; // número de palpites dados
+    private int correctAnswers; // número de palpites corretos
+    private int guessRows; // número de linhas exibindo Button de palpite
+    private int Index; // Numero da escolha da preferencia
+    private SecureRandom random; // usado para tornar o teste aleatório
+    private Handler handler; /// usado para atrasar o carregamento da próximo elemento
+    private Animation shakeAnimation; // animação para palpite incorreto
 
-    private TextView questionNumberTextView; // shows current question #
-    private ImageView flagImageView; // displays a flag
-    private LinearLayout[] guessLinearLayouts; // rows of answer Buttons
-    private TextView answerTextView; // displays Correct! or Incorrect!
+    private TextView questionNumberTextView;  // mostra o número da pergunta atual
+    private ImageView flagImageView; // exibe um elemento
+    private LinearLayout[] guessLinearLayouts; /// linhas de Buttons de resposta
+    private TextView answerTextView; // exibe Correto! ou Incorreto
 
-    // configures the QuizFragment when its View is created
+    // configura QuizFragment quando sua View é criada
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -68,12 +71,12 @@ public class QuizFragment extends Fragment
         random = new SecureRandom();
         handler = new Handler();
 
-        // load the shake animation that's used for incorrect answers
+        // carrega a animação de tremular utilizada para respostas incorretas
         shakeAnimation = AnimationUtils.loadAnimation(getActivity(),
                 R.anim.incorrect_shake);
-        shakeAnimation.setRepeatCount(3); // animation repeats 3 times
+        shakeAnimation.setRepeatCount(3); // a animação se repete 3 vezes
 
-        // get references to GUI components
+        // obtém referências para componentes da interface gráfica do usuário
         questionNumberTextView =
                 (TextView) view.findViewById(R.id.questionNumberTextView);
         flagImageView = (ImageView) view.findViewById(R.id.flagImageView);
@@ -86,7 +89,7 @@ public class QuizFragment extends Fragment
                 (LinearLayout) view.findViewById(R.id.row3LinearLayout);
         answerTextView = (TextView) view.findViewById(R.id.answerTextView);
 
-        // configure listeners for the guess Buttons
+        // configura receptores para os componentes Button de palpite
         for (LinearLayout row : guessLinearLayouts)
         {
             for (int column = 0; column < row.getChildCount(); column++)
@@ -96,20 +99,32 @@ public class QuizFragment extends Fragment
             }
         }
 
-        // set questionNumberTextView's text
+        // configura o texto de questionNumberTextView
         questionNumberTextView.setText(
                 getResources().getString(R.string.question, 1, FLAGS_IN_QUIZ));
-        return view; // returns the fragment's view for display
-    } // end method onCreateView
+        return view; // retorna a view do fragmento para exibir
+    } // fim do método onCreateView
 
-    // update guessRows based on value in SharedPreferences
+    // atualiza o tipo de questinoario com base no valor em SharedPreferences
     public void updateGuessRows(SharedPreferences sharedPreferences)
     {
-        // get the number of guess buttons that should be displayed
+        // obtém a string's dos botões de palpite que devem ser exibidos
         String choices =
                 sharedPreferences.getString(MainActivityQuiz.CHOICES, null);
 
-        guessRows = Integer.parseInt(choices) / 3;
+        if (choices != null && choices.equals("Nome")) {
+            Index = 0; // Só teste mas é para fazer um if pois é melhor, valor string.
+        }
+        if (choices != null && choices.equals("Numero Atomico")){
+            Index = 1;
+        }
+        if (choices != null && choices.equals("Massa Atomico")){
+            Index = 2;
+        }if (choices != null && choices.equals("Numero de periodos")){
+            Index = 3;
+        }
+
+        guessRows = 1;
 
         // hide all guess button LinearLayouts
         for (LinearLayout layout : guessLinearLayouts)
@@ -123,6 +138,7 @@ public class QuizFragment extends Fragment
     // update world regions for quiz based on values in SharedPreferences
     public void updateRegions(SharedPreferences sharedPreferences)
     {
+
         regionsSet =
                 sharedPreferences.getStringSet(MainActivityQuiz.REGIONS, null);
     }
@@ -250,7 +266,10 @@ public class QuizFragment extends Fragment
     // parses the country flag file name and returns the country name
     private String getCountryName(String name)
     {
-        return name.substring(name.indexOf('-') + 1).replace('_', ' ');
+        String names =  name.substring(name.indexOf('-') + 1).replace('_', ' ');
+        String[] parts=names.split(" ");
+        String part1 = parts[Index];
+        return part1;
     }
 
     // called when a guess Button is touched
@@ -269,7 +288,7 @@ public class QuizFragment extends Fragment
                 ++correctAnswers; // increment the number of correct answers
 
                 // display correct answer in green text
-                answerTextView.setText(answer + "!" + " - Yeah Science Bitch! - ");
+                answerTextView.setText(" Correto Yeah Science Bitch!");
                 answerTextView.setTextColor(
                         getResources().getColor(R.color.correct_answer));
 
@@ -292,7 +311,7 @@ public class QuizFragment extends Fragment
 
                                     builder.setMessage(
                                             getResources().getString(R.string.results,
-                                                    totalGuesses, (200 / (double) totalGuesses)));
+                                                    totalGuesses, (100 / (double) totalGuesses)));
 
                                     // "Reset Quiz" Button
                                     builder.setPositiveButton(R.string.reset_quiz,

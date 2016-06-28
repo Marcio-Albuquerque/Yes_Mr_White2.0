@@ -1,3 +1,5 @@
+//Classe principal para chama os subaplicativos
+//Equipe: Jonh, Abdenago e Márcio
 package ufc.topico.com;
 
 import android.app.Activity;
@@ -19,18 +21,18 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Instala no Desktop do bagulho
-        installShortCut();
 
         //Faz a ligação do aplicatvo com o layout
         buttom1 = (Button)findViewById(R.id.jogo1Button);
         buttom2 = (Button)findViewById(R.id.jogo2Button);
-        intent1 = new Intent(this, MainActivityQuiz.class);
-        intent2 = new Intent(this, MainActivityCanhao.class);
-        //Evento para o primeiro buttom
+        intent1 = new Intent(this, MainActivityQuiz.class); // Uma intent para Classa do Quiz Química
+        intent2 = new Intent(this, MainActivityCanhao.class); // Uma intent para Classa o Canhão Química
+
+        //Evento para chama o primeiro buttom
         buttom1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -38,7 +40,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        //Evento para o segundo buttom
+        //Evento chama para o segundo buttom
         buttom2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,26 +49,5 @@ public class MainActivity extends Activity {
         });
     }
 
-    // Fução para criar o icon na tela inicial
-    public void installShortCut(){
-        SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Boolean isAppInstalled = appPreferences.getBoolean("isAppInstalled",false);
 
-        if(isAppInstalled==false){
-
-            Intent shortcutIntent = new Intent(getApplicationContext(), MainActivity.class);
-            shortcutIntent.setAction(Intent.ACTION_MAIN);
-            Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name));
-            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-                    Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.mipmap.ic_launcher));
-            intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-
-            getApplicationContext().sendBroadcast(intent);
-            SharedPreferences.Editor editor = appPreferences.edit();
-            editor.putBoolean("isAppInstalled", true);
-            editor.commit();
-        }
-    }
 }
